@@ -1,0 +1,52 @@
+.App{
+  font-family: 'Lato', sans-serif;
+}
+ .cantainer{
+  display: flex;
+  padding: 25px;
+  gap : 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 1200px;
+  height: 100;
+  margin: 0 auto;
+ }
+
+.cards{
+  flex: 1;
+  min-width: 400px;
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+
+}
+.learn_more:not(img){
+  display: none;
+  position: relative;
+  bottom : 250px;
+  left: 150px;
+  color: white;
+  font-size: large;
+}
+img:hover + .learn_more{
+  display: block;
+}
+img:hover {
+  filter : grayscale(100%) blur(2px);
+  transition: .4s ease-in-out;
+}
+.content {
+  padding: 10px 20px;
+}
+
+.author{
+  display: flex;
+  justify-content: space-between;
+}
+
+.heading{
+  padding: 40px 0px;
+}
+
+.backIcon{
+  display: flex;
+  justify-content: flex-end;
+}
