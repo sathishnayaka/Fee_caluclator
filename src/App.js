@@ -1,103 +1,97 @@
 import './App.scss';
-import axios from 'axios';
 import { useEffect, useState } from 'react';
-import ReactModal from 'react-modal';
-import CloseIcon from './CloseIcon.png'
-// import Modal from './Modal';
+import Data from './data.json';
+
+
 function App() {
-  const [items, setItems]=useState([]);
-  const[isOpen, setIsopen]=useState(false);
+  const [dataObj, setData] = useState({});
+  const [countries, setCountries]=useState([]);
+  const [fees, setFees] = useState('');
+  const [selectedCountry, setSelectedCountry]=useState('');
+  const [course, setCourse] = useState('');
+  const [level, setLevel]=useState('');
+  const [fee, setFee]=useState(null);
   const getDatafromUrl = async()=>{
-    let res= await axios.get("https://my-json-server.typicode.com/Codeinwp/front-end-internship-api/posts");
-    setItems(res.data);
+    console.log(Data);
+    const d= (JSON.stringify(Data))
+    const d2= JSON.parse(d);
+    setData(d2);
   }
   useEffect(()=>{
     getDatafromUrl();
   },[])
+
+  useEffect(()=>{
+    if(fees === "Exam Fee"){
+      const arr =["INDIAN",'FOREIGN','NRI','SAARC'];
+      setCountries(arr);
+    }
+    if(fees === "Application Fee"){
+      let arr =['INDIAN','FOREIGN'];
+      setCountries(arr);
+    }
+    if(fees === '') {
+      setCountries([])
+      setSelectedCountry('')
+      setFee(null);
+    }
+  },[fees])
+  const handleSubmit = () =>{
+    if(fees === 'Exam Fee'){
+    let estimatedfee = dataObj[`${fees}`][`${selectedCountry}`]["ALL_COURSES​"]['ALL_LEVEL​']["amount"];
+    setFee(estimatedfee);
+    }else{
+      let estimatedfee =  dataObj[`${fees}`][`${selectedCountry}`]["ALL_COURSES​"][`${level}`]["amount"]
+      setFee(estimatedfee);
+    }
+  }
   return (
-    <div className="App">
-      <div className="cantainer">
-        <Modal item={items[3]} isOpen={isOpen} setIsopen={setIsopen}/>
-      { items.map((item)=>(
-        <div className="cards" key={item.id}>
-            <img className="Img"src={item.thumbnail.large} alt={item.id} width="100%" height="auto"/>
-            <div className='learn_more' onClick={()=>{setIsopen(true)}}><h1>LEARN MORE</h1></div>
-            <div className='content'>
-              <h1>{item.title}</h1>
-              <div className="heading">
-              <label>{item.content}</label>
-              </div>
-              <div className="author">
-                <div>
-                  <label color='red'>{item.author.name}</label>
-                  <label>{`${"-"}${item.author.role}`}</label>
-                </div>
-                <div>
-                  <label>{item.date}</label>
-                </div>
-              </div>
-
-            </div>
-        </div>
-      ))
-
-      }
-
+    <>
+    <div className="cantainer">
+      <div>
+        <h1>fee caluclator</h1>
       </div>
+      <div>
+      <select className="fees" onChange={(e)=>setFees(e.target.value)}>
+        <option value=''>select Fees</option>
+        <option value='Exam Fee'>Exam Fee</option>
+        <option value="Application Fee">Application Fee</option>
+      </select>
+      </div>
+      {countries.length !== 0 && <div>
+        <select className="fees" onChange={(e)=>setSelectedCountry(e.target.value)}>
+          <option value=''>Select country</option>
+          {countries && countries.map((ele)=>(
+            <option value={ele}>{ele}</option>
+          ))}
+        </select>
+      </div>}
+      {countries.length !== 0 && selectedCountry !== '' && <div>
+      <select className="fees" onChange={(e)=>setCourse(e.target.value)}>
+          <option value=''>Select courses</option>
+          {countries && ['MEDICAL','DENTAL','AYURVEDA'].map((ele)=>(
+            <option value={ele}>{ele}</option>
+          ))}
+        </select>
+      </div>
+      }
+      {countries.length !== 0 && selectedCountry !== '' && course!== ''  && course  && <div>
+      <select className="fees" onChange={(e)=>setLevel(e.target.value)}>
+          <option value=''>Select level of course</option>
+          {countries && ['UG','UG-DIPLOMA','PG'].map((ele)=>(
+            <option value={ele}>{ele}</option>
+          ))}
+        </select>
+      </div>
+      }
+      {level && <div>
+        <button onClick={handleSubmit} style={{padding: '15px'}}>KNOW YOUR FEE CLICK HERE</button>
+        {fee !== null && <h1>{fee} Rupees</h1>}
+        </div>}
     </div>
-  );
+      
+    </>
+  )
 }
-
 export default App;
 
-const styles = {
-	content: {
-		top: '50%',
-		left: '50%',
-		right: 'auto',
-		bottom: 'auto',
-		marginRight: '-50%',
-		minWidth: '300px',
-		width: '30%',
-		transform: 'translate(-50%, -50%)',
-		borderRadius: 10,
-		padding: '20px 30px',
-		fontFamily: 'Nunito',
-	},
-	overlay: {
-		backgroundColor: 'rgba(0, 0, 0, 0.3)',
-	},
-};
-
-function Modal({item,isOpen,setIsopen}) {
-	return (
-		<ReactModal isOpen={isOpen} style={styles}>
-			<div className='backIcon'>
-				<img
-					src={CloseIcon}
-					alt="Close Icon"
-          width="20px"
-          height="20px"
-          onClick={()=>{setIsopen(false)}}
-				/>
-			</div>
-			<img src={item.thumbnail.small} alt={item.id} width="100%" height="auto"/>
-            <div className='content'>
-                <h1>{item.title}</h1>
-              <div className="heading">
-                <label>{item.content}</label>
-              </div>
-              <div className="author">
-                <div>
-                  <div>
-                  <img src={item.author.avatar} alt="author Image" width="50px" height="50px"/>
-                  </div>
-                  <label color='red'>{item.author.name}</label>
-                  <label>{`${"-"}${item.author.role}`}</label>
-                </div>
-              </div>
-            </div>
-              
-		</ReactModal>
-	);
-}
